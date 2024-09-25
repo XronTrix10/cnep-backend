@@ -4,6 +4,7 @@ import (
 	"log"
 	"os"
 
+	"cnep-backend/pkg/lib"
 	"cnep-backend/source/config"
 	"cnep-backend/source/database"
 	"cnep-backend/source/routes"
@@ -20,6 +21,8 @@ func main() {
 
 	// Initialize config
 	cfg := config.New()
+	// Initialize SMTP
+	lib.InitSMTP()
 
 	// Initialize database
 	db, err := database.Connect(cfg)
