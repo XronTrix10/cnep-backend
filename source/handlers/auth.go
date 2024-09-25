@@ -13,20 +13,18 @@ import (
 // CheckEmailExistence checks if a user with the given email exists
 func CheckEmailExistence(db *gorm.DB) fiber.Handler {
 	return func(c *fiber.Ctx) error {
-		var input struct {
-			Email string `json:"email"`
+		email := c.Query("email")
+
+		if email == "" {
+			return c.Status(fiber.StatusBadRequest).JSON(fiber.Map{"error": "Email parameter is required"})
 		}
 
-		if err := c.BodyParser(&input); err != nil {
-			return c.Status(fiber.StatusBadRequest).JSON(fiber.Map{"error": "Cannot parse JSON"})
-		}
-
-		if !utils.IsValidEmail(input.Email) {
+		if !utils.IsValidEmail(email) {
 			return c.Status(fiber.StatusBadRequest).JSON(fiber.Map{"error": "Invalid email format"})
 		}
 
 		var user models.User
-		result := db.Where("email = ?", input.Email).First(&user)
+		result := db.Where("email = ?", email).First(&user)
 
 		if result.Error == nil {
 			// User exists
@@ -172,4 +170,43 @@ func Login(db *gorm.DB) fiber.Handler {
 			"user":  user,
 		})
 	}
+}
+
+func RegenerateOTP(db *gorm.DB) fiber.Handler {
+	return func(c *fiber.Ctx) error {
+		var input struct {
+			Email string `json:"email"`
+		}
+
+		if err := c.BodyParser(&input); err != nil {
+			return c.Status(fiber.StatusBadRequest).JSON(fiber.Map{"error": "Cannot parse JSON"})
+		}
+
+		var user models.User
+		if err := db.Where("email = ?", input.Email).First(&user).Error; err != nil {
+			return c.Status(fiber.StatusNotFound).JSON(fiber.Map{"error": "User not found"})
+		}
+
+		return regenerateOTP(c, db, &user)
+	}
+}
+
+func regenerateOTP(c *fiber.Ctx, db *gorm.DB, user *models.User) error {
+	otp := utils.GenerateOTP()
+	otpExpiry := time.Now().Add(15 * time.Minute)
+
+	user.OTP = otp
+	user.OTPExpiry = otpExpiry
+
+	if err := db.Save(user).Error; err != nil {
+		return c.Status(fiber.StatusInternalServerError).JSON(fiber.Map{"error": "Could not update OTP"})
+	}
+
+	if err := utils.SendOTPEmail(user.Email, user.Name, otp); err != nil {
+		return c.Status(fiber.StatusInternalServerError).JSON(fiber.Map{"error": "Could not send OTP email"})
+	}
+
+	return c.Status(fiber.StatusOK).JSON(fiber.Map{
+		"message": "New OTP sent. Please verify your email with the new OTP.",
+	})
 }
