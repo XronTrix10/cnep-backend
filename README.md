@@ -35,13 +35,6 @@ cnep-backend/
 │   │   ├── connection.go
 │   │   ├── conversation.go
 │   │   └── notification.go
-│   ├── repositories/
-│   │   ├── user_repository.go
-│   │   ├── post_repository.go
-│   │   ├── comment_repository.go
-│   │   ├── connection_repository.go
-│   │   ├── conversation_repository.go
-│   │   └── notification_repository.go
 │   ├── routes/
 │   │   └── routes.go
 │   └── websocket/
