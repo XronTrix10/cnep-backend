@@ -6,7 +6,7 @@ import (
 
 	"cnep-backend/source/config"
 	"github.com/gofiber/fiber/v2"
-	"github.com/golang-jwt/jwt/v4"
+	"github.com/golang-jwt/jwt/v5"
 )
 
 func AuthMiddleware() fiber.Handler {
