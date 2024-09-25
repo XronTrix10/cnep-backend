@@ -1,6 +1,6 @@
 # CNEP Backend
 
-This is a Go backend for the CNEP project. It is built using the Fiber framework and uses PostgreSQL as the database.
+This is a Go backend for the [CNEP project](https://github.com/users/XronTrix10/projects/5/). It is built using the Fiber framework and uses PostgreSQL as the database.
 
 ## Folder Structure
 
@@ -28,6 +28,9 @@ cnep-backend/
 │   ├── models/
 │   │   ├── user.go
 │   │   ├── post.go
+│   │   ├── badge.go
+│   │   ├── message.go
+│   │   ├── reactions.go
 │   │   ├── comment.go
 │   │   ├── connection.go
 │   │   ├── conversation.go
