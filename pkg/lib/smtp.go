@@ -1,43 +1,47 @@
 package lib
 
 import (
+	"fmt"
 	"log"
 	"net/smtp"
 	"os"
 )
 
-var auth smtp.Auth
+var (
+	auth   smtp.Auth
+	sender string
+)
 
 func InitSMTP() {
-	// Set up authentication information.
-	sender := os.Getenv("SENDER_EMAIL")
+	// Get authentication information from environment variables
+	sender = os.Getenv("SENDER_EMAIL")
 	password := os.Getenv("SMTP_PASSWORD")
 
 	if sender == "" || password == "" {
-		panic("SMTP authentication information not set")
+		log.Fatal("SMTP authentication information not set")
 	}
 
-	// Set up authentication information.
+	// Set up authentication information for Gmail SMTP
 	auth = smtp.PlainAuth("", sender, password, "smtp.gmail.com")
 
 	if auth == nil {
-		panic("SMTP authentication information is invalid")
+		log.Fatal("SMTP authentication information is invalid")
 	} else {
 		log.Println("SMTP authentication information set")
 	}
 }
 
-func SendEmail(from string, to []string, subject string, body string) error {
+func SendEmail(to []string, subject string, body string) error {
+	// Compose the message
+	msg := fmt.Sprintf("To: %s\r\nSubject: %s\r\n\r\n%s", to[0], subject, body)
 
-	msg := []byte("To: " + to[0] + "\r\n" +
-		"Subject: " + subject + "\r\n" +
-		"\r\n" +
-		body + "\r\n")
-
-	err := smtp.SendMail("mail.example.com:25", auth, "sender@example.org", to, msg)
+	// Send the email
+	err := smtp.SendMail("smtp.gmail.com:587", auth, sender, to, []byte(msg))
 	if err != nil {
-		log.Fatal("Error sending email: " + err.Error())
+		log.Printf("Error sending email: %v", err)
 		return err
 	}
+
+	log.Printf("Email sent successfully to %s", to[0])
 	return nil
 }
