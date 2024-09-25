@@ -18,6 +18,9 @@ type User struct {
 	Badges            pq.Int64Array  `gorm:"type:integer[]" json:"badges"`
 	Designation       string         `json:"designation"`
 	Password          string         `gorm:"not null" json:"-"`
+	OTP               string         `gorm:"size:6" json:"-"`
+	OTPExpiry         time.Time      `json:"-"`
+	IsVerified        bool           `gorm:"default:false" json:"is_verified"`
 	CreatedAt         time.Time      `gorm:"default:current_timestamp" json:"created_at"`
 	UpdatedAt         time.Time      `gorm:"default:current_timestamp" json:"updated_at"`
 }

@@ -2,19 +2,22 @@
 
 ```sql
 CREATE TABLE users (
-    id SERIAL PRIMARY KEY,
-    name VARCHAR(255) NOT NULL,
-    email VARCHAR(255) UNIQUE NOT NULL,
-    phone VARCHAR(20),
     address TEXT,
-    skills TEXT[],
+    badges INTEGER[],
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    designation VARCHAR(255),
+    email VARCHAR(255) UNIQUE NOT NULL,
     helped_others_count INTEGER DEFAULT 0,
     help_received_count INTEGER DEFAULT 0,
-    rating INTEGER DEFAULT 0,
-    badges INTEGER[],
-    designation VARCHAR(255),
+    id SERIAL PRIMARY KEY,
+    is_verified BOOLEAN DEFAULT FALSE,
+    name VARCHAR(255) NOT NULL,
+    otp VARCHAR(6),
+    otp_expiry TIMESTAMP,
     password VARCHAR(255) NOT NULL,
-    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    phone VARCHAR(20),
+    rating INTEGER DEFAULT 0,
+    skills TEXT[],
     updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
 );
 
@@ -172,4 +175,3 @@ CREATE INDEX idx_notifications_created_at ON notifications(created_at);
 CREATE INDEX idx_notifications_user_id_read ON notifications(user_id, read);
 CREATE INDEX idx_notifications_user_id_created_at ON notifications(user_id, created_at);
 ```
-
