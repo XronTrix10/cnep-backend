@@ -97,6 +97,14 @@ func VerifyOTP(db *gorm.DB) fiber.Handler {
 			return c.Status(fiber.StatusBadRequest).JSON(fiber.Map{"error": "Cannot parse JSON"})
 		}
 
+		if input.Email == "" || input.OTP == "" {
+			return c.Status(fiber.StatusBadRequest).JSON(fiber.Map{"error": "Email and OTP parameters are required"})
+		}
+
+		if !utils.IsValidEmail(input.Email) {
+			return c.Status(fiber.StatusBadRequest).JSON(fiber.Map{"error": "Invalid email or OTP format"})
+		}
+
 		var user models.User
 		if err := db.Where("email = ?", input.Email).First(&user).Error; err != nil {
 			return c.Status(fiber.StatusNotFound).JSON(fiber.Map{"error": "User not found"})
@@ -136,6 +144,18 @@ func Login(db *gorm.DB) fiber.Handler {
 		if err := c.BodyParser(&input); err != nil {
 			return c.Status(fiber.StatusBadRequest).JSON(fiber.Map{
 				"error": "Invalid input",
+			})
+		}
+
+		if input.Email == "" || input.Password == "" {
+			return c.Status(fiber.StatusBadRequest).JSON(fiber.Map{
+				"error": "Email and password parameters are required",
+			})
+		}
+
+		if !utils.IsValidEmail(input.Email) || !utils.IsValidPassword(input.Password) {
+			return c.Status(fiber.StatusBadRequest).JSON(fiber.Map{
+				"error": "Invalid email or password",
 			})
 		}
 
@@ -180,6 +200,10 @@ func RegenerateOTP(db *gorm.DB) fiber.Handler {
 
 		if err := c.BodyParser(&input); err != nil {
 			return c.Status(fiber.StatusBadRequest).JSON(fiber.Map{"error": "Cannot parse JSON"})
+		}
+
+		if !utils.IsValidEmail(input.Email) {
+			return c.Status(fiber.StatusBadRequest).JSON(fiber.Map{"error": "Invalid email format"})
 		}
 
 		var user models.User
