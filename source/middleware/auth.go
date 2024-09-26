@@ -1,12 +1,10 @@
 package middleware
 
 import (
-	"fmt"
 	"strings"
 
-	"cnep-backend/source/config"
+	"cnep-backend/pkg/utils"
 	"github.com/gofiber/fiber/v2"
-	"github.com/golang-jwt/jwt/v5"
 )
 
 func AuthMiddleware() fiber.Handler {
@@ -24,32 +22,16 @@ func AuthMiddleware() fiber.Handler {
 		// Extract the token from the Authorization header
 		tokenString := strings.TrimPrefix(authHeader, "Bearer ")
 
-		// Parse and validate the token
-		token, err := jwt.Parse(tokenString, func(token *jwt.Token) (interface{}, error) {
-			// Validate the signing method
-			if _, ok := token.Method.(*jwt.SigningMethodHMAC); !ok {
-				return nil, fmt.Errorf("unexpected signing method: %v", token.Header["alg"])
-			}
-
-			// Return the secret key for validation
-			return []byte(config.New().JWTSecret), nil
-		})
-
+		// Validate the JWT token
+		userID, err := utils.ValidateJWT(tokenString)
 		if err != nil {
 			return c.Status(fiber.StatusUnauthorized).JSON(fiber.Map{
 				"error": "Unauthorized: Invalid token",
 			})
 		}
 
-		// Check if the token is valid
-		if claims, ok := token.Claims.(jwt.MapClaims); ok && token.Valid {
-			// Add the user ID to the context for use in subsequent handlers
-			c.Locals("userID", claims["user_id"])
-			return c.Next()
-		}
-
-		return c.Status(fiber.StatusUnauthorized).JSON(fiber.Map{
-			"error": "Unauthorized: Invalid token",
-		})
+		// Add the user ID to the context for use in subsequent handlers
+		c.Locals("userID", userID)
+		return c.Next()
 	}
 }
