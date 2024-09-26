@@ -144,7 +144,7 @@ func Login(db *gorm.DB) fiber.Handler {
 
 		if err := c.BodyParser(&input); err != nil {
 			return c.Status(fiber.StatusBadRequest).JSON(fiber.Map{
-				"error": "Invalid input",
+				"error": "Invalid Request Body",
 			})
 		}
 
@@ -180,9 +180,26 @@ func Login(db *gorm.DB) fiber.Handler {
 			})
 		}
 
+		userResponse := models.UserResponse{
+			ID:                user.ID,
+			Name:              user.Name,
+			Email:             user.Email,
+			Phone:             user.Phone,
+			Address:           user.Address,
+			Skills:            user.Skills,
+			HelpedOthersCount: user.HelpedOthersCount,
+			HelpReceivedCount: user.HelpReceivedCount,
+			Rating:            user.Rating,
+			Badges:            user.Badges,
+			Designation:       user.Designation,
+			IsVerified:        user.IsVerified,
+			CreatedAt:         user.CreatedAt,
+			UpdatedAt:         user.UpdatedAt,
+		}
+
 		return c.JSON(fiber.Map{
 			"token": token,
-			"user":  user,
+			"user":  userResponse,
 		})
 	}
 }
