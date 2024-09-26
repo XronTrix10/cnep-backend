@@ -37,7 +37,7 @@ func SendOTPEmail(to, name, otp string) error {
 	}
 
 	// Set up email subject and recipient
-	subject := "Your OTP for Authentication"
+	subject := "OTP for Authentication"
 	recipient := []string{to}
 
 	// Send the email
