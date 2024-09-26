@@ -21,11 +21,10 @@ func SetupRoutes(app *fiber.App, db *gorm.DB) {
 	app.Post("/api/otp/verify", handlers.VerifyOTP(db))
 
 	// Protected routes
-	// api := app.Group("/api", middleware.AuthMiddleware())
+	api := app.Group("/api", middleware.AuthMiddleware())
 
 	// User routes
-	// api.Get("/users", handlers.GetUsers(db))
-	// api.Get("/users/:id", handlers.GetUser(db))
+	api.Get("/users/profile", handlers.GetUserProfile(db))
 	// api.Put("/users/:id", handlers.UpdateUser(db))
 
 	// // Post routes
