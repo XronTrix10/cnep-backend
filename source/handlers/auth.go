@@ -3,11 +3,10 @@ package handlers
 import (
 	"cnep-backend/pkg/utils"
 	"cnep-backend/source/models"
-	"time"
-
 	"github.com/gofiber/fiber/v2"
 	"golang.org/x/crypto/bcrypt"
 	"gorm.io/gorm"
+	"time"
 )
 
 /*
@@ -101,6 +100,9 @@ func Register(db *gorm.DB) fiber.Handler {
 		user.IsVerified = false
 
 		if err := db.Create(&user).Error; err != nil {
+			if utils.IsDuplicateEntryError(err) {
+				return c.Status(fiber.StatusConflict).JSON(fiber.Map{"error": "Email already exists"})
+			}
 			return c.Status(fiber.StatusInternalServerError).JSON(fiber.Map{"error": "Could not create user"})
 		}
 
