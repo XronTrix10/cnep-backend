@@ -32,8 +32,13 @@ func InitSMTP() {
 }
 
 func SendEmail(to []string, subject string, body string) error {
-	// Compose the message
-	msg := fmt.Sprintf("To: %s\r\nSubject: %s\r\n\r\n%s", to[0], subject, body)
+	// Compose the message with headers for HTML content
+	msg := fmt.Sprintf("To: %s\r\n"+
+		"Subject: %s\r\n"+
+		"MIME-Version: 1.0\r\n"+
+		"Content-Type: text/html; charset=UTF-8\r\n"+
+		"\r\n"+
+		"%s", to[0], subject, body)
 
 	// Send the email
 	err := smtp.SendMail("smtp.gmail.com:587", auth, sender, to, []byte(msg))
