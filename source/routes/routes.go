@@ -25,7 +25,7 @@ func SetupRoutes(app *fiber.App, db *gorm.DB) {
 
 	// User routes
 	api.Get("/users/profile", handlers.GetUserProfile(db))
-	// api.Put("/users/:id", handlers.UpdateUser(db))
+	api.Put("/users/profile", handlers.UpdateUserProfile(db))
 
 	// // Post routes
 	// api.Get("/posts", handlers.GetPosts(db))
