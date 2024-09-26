@@ -14,10 +14,10 @@ import (
 const otpChars = "ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789"
 
 func GenerateOTP() string {
-	rand.Seed(time.Now().UnixNano())
+	r := rand.New(rand.NewSource(time.Now().UnixNano()))
 	otp := make([]byte, 8)
 	for i := range otp {
-		otp[i] = otpChars[rand.Intn(len(otpChars))]
+		otp[i] = otpChars[r.Intn(len(otpChars))]
 	}
 	return string(otp)
 }
