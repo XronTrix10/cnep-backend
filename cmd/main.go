@@ -2,7 +2,6 @@ package main
 
 import (
 	"log"
-	"os"
 
 	"cnep-backend/pkg/lib"
 	"cnep-backend/source/config"
@@ -37,9 +36,6 @@ func main() {
 	routes.SetupRoutes(app, db)
 
 	// Start server
-	port := os.Getenv("PORT")
-	if port == "" {
-		port = "3000"
-	}
+	port := cfg.ServerPort
 	log.Fatal(app.Listen(":" + port))
 }
