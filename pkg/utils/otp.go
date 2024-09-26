@@ -22,10 +22,9 @@ func GenerateOTP() string {
 	return string(otp)
 }
 
-func SendOTPEmail(to, name, otp string) error {
+func SendOTPEmail(to, otp string) error {
 	// Prepare the email data
 	data := template.OTPEmailData{
-		Name: name,
 		OTP:  otp,
 	}
 
@@ -37,7 +36,7 @@ func SendOTPEmail(to, name, otp string) error {
 	}
 
 	// Set up email subject and recipient
-	subject := "OTP for Authentication"
+	subject := "Verification Code"
 	recipient := []string{to}
 
 	// Send the email

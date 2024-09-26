@@ -77,7 +77,7 @@ func regenerateOTP(c *fiber.Ctx, db *gorm.DB, user *models.User) error {
 		return c.Status(fiber.StatusInternalServerError).JSON(fiber.Map{"error": "Could not update OTP"})
 	}
 
-	if err := utils.SendOTPEmail(user.Email, user.Name, otp); err != nil {
+	if err := utils.SendOTPEmail(user.Email, otp); err != nil {
 		return c.Status(fiber.StatusInternalServerError).JSON(fiber.Map{"error": "Could not send OTP email"})
 	}
 

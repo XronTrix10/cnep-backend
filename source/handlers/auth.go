@@ -106,10 +106,8 @@ func Register(db *gorm.DB) fiber.Handler {
 			return c.Status(fiber.StatusInternalServerError).JSON(fiber.Map{"error": "Could not create user"})
 		}
 
-		// TODO: Which feilds to take input fro user at registration ?
-
 		// Send OTP via email
-		if err := utils.SendOTPEmail(user.Email, "John Doe", otp); err != nil {
+		if err := utils.SendOTPEmail(user.Email, otp); err != nil {
 			return c.Status(fiber.StatusInternalServerError).JSON(fiber.Map{"error": "Could not send OTP email"})
 		}
 
