@@ -20,22 +20,23 @@ func main() {
 
 	// Initialize config
 	cfg := config.New()
+
 	// Initialize SMTP
 	lib.InitSMTP()
 
 	// Initialize database
-	db, err := database.Connect(cfg)
-	if err != nil {
-		log.Fatal(err)
-	}
+	database.Connect(cfg)
+	// Close database connection when the program exits
+	defer database.Close()
 
 	// Create Fiber app
 	app := fiber.New()
 
 	// Setup routes
-	routes.SetupRoutes(app, db)
+	routes.SetupRoutes(app, database.DB)
 
 	// Start server
 	port := cfg.ServerPort
+	log.Printf("Server is starting on port %s", port)
 	log.Fatal(app.Listen(":" + port))
 }
