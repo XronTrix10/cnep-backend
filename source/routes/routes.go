@@ -17,8 +17,8 @@ func SetupRoutes(app *fiber.App, db *gorm.DB) {
 	app.Get("/api/auth/users", handlers.CheckEmailExistence(db))
 	app.Post("/api/auth/register", handlers.Register(db))
 	app.Post("/api/auth/login", handlers.Login(db))
-	app.Post("/api/otp/generate", handlers.RegenerateOTP(db))
-	app.Post("/api/otp/verify", handlers.VerifyOTP(db))
+	app.Post("/api/otp/generate", handlers.RegenerateOTP())
+	app.Post("/api/otp/verify", handlers.VerifyOTP())
 
 	// Protected routes
 	api := app.Group("/api", middleware.AuthMiddleware())
