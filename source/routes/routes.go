@@ -5,10 +5,9 @@ import (
 	"cnep-backend/source/middleware"
 
 	"github.com/gofiber/fiber/v2"
-	"gorm.io/gorm"
 )
 
-func SetupRoutes(app *fiber.App, db *gorm.DB) {
+func SetupRoutes(app *fiber.App) {
 
 	// use logger middleware
 	app.Use(middleware.Logger())

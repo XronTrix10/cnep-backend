@@ -33,7 +33,7 @@ func main() {
 	app := fiber.New()
 
 	// Setup routes
-	routes.SetupRoutes(app, database.DB)
+	routes.SetupRoutes(app)
 
 	// Start server
 	port := cfg.ServerPort
