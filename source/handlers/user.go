@@ -8,6 +8,12 @@ import (
 	"gorm.io/gorm"
 )
 
+/*
+GetUserProfile: Fetches the user profile for the authenticated user.
+It takes the user ID from the context and fetches the user profile from the database.
+If the user is not found or any other error occurs, it returns an appropriate error message.
+The function returns a JSON response with the user profile.
+*/
 func GetUserProfile(db *gorm.DB) fiber.Handler {
 	return func(c *fiber.Ctx) error {
 		// Get the user ID from the context (set by the AuthMiddleware)
@@ -36,6 +42,12 @@ func GetUserProfile(db *gorm.DB) fiber.Handler {
 	}
 }
 
+/*
+UpdateUserProfile: Updates the user profile for the authenticated user.
+It takes the user ID from the context, the updated data from the request body, and the database connection.
+If the user is not found or any other error occurs, it returns an appropriate error message.
+The function returns a JSON response with the updated user profile.
+*/
 func UpdateUserProfile(db *gorm.DB) fiber.Handler {
 	return func(c *fiber.Ctx) error {
 		userID, ok := c.Locals("userID").(uint)
