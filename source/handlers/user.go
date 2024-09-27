@@ -1,11 +1,8 @@
 package handlers
 
 import (
-	"cnep-backend/pkg/utils"
-	"cnep-backend/source/models"
+	"cnep-backend/source/services"
 	"github.com/gofiber/fiber/v2"
-	"github.com/lib/pq"
-	"gorm.io/gorm"
 	"strconv"
 )
 
@@ -15,7 +12,7 @@ It takes the user ID from the context and fetches the user profile from the data
 If the user is not found or any other error occurs, it returns an appropriate error message.
 The function returns a JSON response with the user profile.
 */
-func GetUserProfile(db *gorm.DB) fiber.Handler {
+func GetUserProfile() fiber.Handler {
 	return func(c *fiber.Ctx) error {
 		// Get the user ID from the context (set by the AuthMiddleware)
 		userID, ok := c.Locals("userID").(uint)
@@ -25,20 +22,44 @@ func GetUserProfile(db *gorm.DB) fiber.Handler {
 			})
 		}
 
-		// Fetch the user from the database
-		var user models.UserResponse
-		if err := db.Table("users").First(&user, userID).Error; err != nil {
-			if err == gorm.ErrRecordNotFound {
-				return c.Status(fiber.StatusNotFound).JSON(fiber.Map{
-					"error": "User not found",
-				})
+		user, err := services.GetUserProfileByID(uint(userID))
+		if err != nil {
+			if fiberErr, ok := err.(*fiber.Error); ok {
+				return c.Status(fiberErr.Code).JSON(fiber.Map{"error": fiberErr.Message})
 			}
-			return c.Status(fiber.StatusInternalServerError).JSON(fiber.Map{
-				"error": "Error fetching user profile",
-			})
+			return c.Status(fiber.StatusInternalServerError).JSON(fiber.Map{"error": "Internal Server Error"})
 		}
 
 		// Return the user profile
+		return c.Status(fiber.StatusOK).JSON(user)
+	}
+}
+
+/*
+GetUserProfileByID: Fetches the user profile for the specified user ID.
+It takes the user ID from the URL parameter and fetches the user profile from the database.
+If the user is not found or any other error occurs, it returns an appropriate error message.
+The function returns a JSON response with the user profile.
+*/
+func GetUserProfileByID() fiber.Handler {
+	return func(c *fiber.Ctx) error {
+		// Get the user ID from the URL parameter
+		userIDParam := c.Params("id")
+
+		// Validate that the user ID is an integer
+		userID, err := strconv.Atoi(userIDParam)
+		if err != nil {
+			return c.Status(fiber.StatusBadRequest).JSON(fiber.Map{"error": "Invalid user ID format"})
+		}
+
+		user, err := services.GetUserProfileByID(uint(userID))
+		if err != nil {
+			if fiberErr, ok := err.(*fiber.Error); ok {
+				return c.Status(fiberErr.Code).JSON(fiber.Map{"error": fiberErr.Message})
+			}
+			return c.Status(fiber.StatusInternalServerError).JSON(fiber.Map{"error": "Internal Server Error"})
+		}
+
 		return c.Status(fiber.StatusOK).JSON(user)
 	}
 }
@@ -49,7 +70,7 @@ It takes the user ID from the context, the updated data from the request body, a
 If the user is not found or any other error occurs, it returns an appropriate error message.
 The function returns a JSON response with the updated user profile.
 */
-func UpdateUserProfile(db *gorm.DB) fiber.Handler {
+func UpdateUserProfile() fiber.Handler {
 	return func(c *fiber.Ctx) error {
 		userID, ok := c.Locals("userID").(uint)
 		if !ok {
@@ -65,143 +86,17 @@ func UpdateUserProfile(db *gorm.DB) fiber.Handler {
 			})
 		}
 
-		// Define allowed fields for update
-		allowedFields := map[string]bool{
-			"name":                true,
-			"phone":               true,
-			"address":             true,
-			"skills":              true,
-			"designation":         true,
-			"helped_others_count": true,
-			"help_received_count": true,
-			"rating":              true,
-			"badges":              true,
-		}
-
-		// Filter out non-allowed fields and validate data
-		filteredData := make(map[string]interface{})
-		for key, value := range updateData {
-			if allowedFields[key] {
-				switch key {
-				case "name", "phone", "address", "designation":
-					if str, ok := value.(string); ok && str != "" {
-						filteredData[key] = str
-					}
-				case "skills":
-					if skills, ok := updateData["skills"].([]interface{}); ok {
-						// Convert []interface{} to []string
-						var skillsStr []string
-						for _, skill := range skills {
-							if str, ok := skill.(string); ok {
-								skillsStr = append(skillsStr, str)
-							} else {
-								return c.Status(fiber.StatusBadRequest).JSON(fiber.Map{
-									"error": "Invalid skill type",
-								})
-							}
-						}
-						filteredData[key] = pq.StringArray(skillsStr)
-					}
-				case "helped_others_count", "help_received_count":
-					if count, ok := value.(float64); ok {
-						filteredData[key] = uint(count)
-					}
-				case "rating":
-					if rating, ok := value.(float64); ok {
-						if rating > 5 || rating < 1 {
-							return c.Status(fiber.StatusBadRequest).JSON(fiber.Map{
-								"error": "Rating must be between 1 and 5",
-							})
-						}
-						filteredData[key] = float32(rating)
-					}
-				case "badges":
-					if badges, ok := value.([]interface{}); ok {
-						// Convert []interface{} to []int64
-						intBadges := make([]int64, len(badges))
-						for i, badge := range badges {
-							if intBadge, ok := badge.(float64); ok {
-								intBadges[i] = int64(intBadge)
-							} else {
-								return c.Status(fiber.StatusBadRequest).JSON(fiber.Map{
-									"error": "Invalid badge type",
-								})
-							}
-						}
-						filteredData[key] = pq.Int64Array(intBadges)
-					}
-				}
+		user, err := services.UpdateUserProfile(userID, updateData)
+		if err != nil {
+			if fiberErr, ok := err.(*fiber.Error); ok {
+				return c.Status(fiberErr.Code).JSON(fiber.Map{"error": fiberErr.Message})
 			}
-		}
-
-		// Check if there are any valid fields to update
-		if len(filteredData) == 0 {
-			return c.Status(fiber.StatusBadRequest).JSON(fiber.Map{
-				"error": "No valid fields to update",
-			})
-		}
-
-		var user models.User
-		if err := db.First(&user, userID).Error; err != nil {
-			if err == gorm.ErrRecordNotFound {
-				return c.Status(fiber.StatusNotFound).JSON(fiber.Map{
-					"error": "User not found",
-				})
-			}
-			return c.Status(fiber.StatusInternalServerError).JSON(fiber.Map{
-				"error": "Error fetching user profile",
-			})
-		}
-
-		// Update only the allowed fields
-		if err := db.Model(&user).Updates(filteredData).Error; err != nil {
-			return c.Status(fiber.StatusInternalServerError).JSON(fiber.Map{
-				"error": "Error updating user profile",
-			})
-		}
-
-		// Fetch the updated user from the database
-		if err := db.First(&user, userID).Error; err != nil {
-			return c.Status(fiber.StatusInternalServerError).JSON(fiber.Map{
-				"error": "Error fetching updated user profile",
-			})
+			return c.Status(fiber.StatusInternalServerError).JSON(fiber.Map{"error": "Internal Server Error"})
 		}
 
 		return c.Status(fiber.StatusOK).JSON(fiber.Map{
 			"message": "User profile updated successfully",
-			"user":    utils.ConvertToUserResponse(&user),
+			"user":    user,
 		})
-	}
-}
-
-/*
-GetUserProfileByID: Fetches the user profile for the specified user ID.
-It takes the user ID from the URL parameter and fetches the user profile from the database.
-If the user is not found or any other error occurs, it returns an appropriate error message.
-The function returns a JSON response with the user profile.
-*/
-func GetUserProfileByID(db *gorm.DB) fiber.Handler {
-	return func(c *fiber.Ctx) error {
-		// Get the user ID from the URL parameter
-		userIDParam := c.Params("id")
-
-		// Validate that the user ID is an integer
-		userID, err := strconv.Atoi(userIDParam)
-		if err != nil {
-			return c.Status(fiber.StatusBadRequest).JSON(fiber.Map{"error": "Invalid user ID format"})
-		}
-
-		var user models.User
-		if err := db.First(&user, "id = ?", userID).Error; err != nil {
-			if err == gorm.ErrRecordNotFound {
-				return c.Status(fiber.StatusNotFound).JSON(fiber.Map{"error": "User not found"})
-			}
-			return c.Status(fiber.StatusInternalServerError).JSON(fiber.Map{"error": "Failed to fetch user profile"})
-		}
-
-		// Convert the user model to a UserResponse
-		userResponse := utils.ConvertToUserResponse(&user)
-
-		return c.Status(fiber.StatusOK).JSON(userResponse)
 	}
 }
