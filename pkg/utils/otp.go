@@ -12,20 +12,36 @@ import (
 )
 
 const otpChars = "ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789"
+const otpLength = 8
 
 func GenerateOTP() string {
 	r := rand.New(rand.NewSource(time.Now().UnixNano()))
-	otp := make([]byte, 8)
-	for i := range otp {
-		otp[i] = otpChars[r.Intn(len(otpChars))]
+	otp := make([]byte, otpLength)
+
+	// Ensure at least 3 digits
+	digitCount := 0
+	for digitCount < 3 {
+		pos := r.Intn(otpLength)
+		if otp[pos] == 0 { // Ensure we don't overwrite already set digits
+			otp[pos] = otpChars[r.Intn(10)+26] // Digits are in the last 10 characters of otpChars
+			digitCount++
+		}
 	}
+
+	// Fill the remaining positions
+	for i := range otp {
+		if otp[i] == 0 {
+			otp[i] = otpChars[r.Intn(len(otpChars))]
+		}
+	}
+
 	return string(otp)
 }
 
 func SendOTPEmail(to, otp string) error {
 	// Prepare the email data
 	data := template.OTPEmailData{
-		OTP:  otp,
+		OTP: otp,
 	}
 
 	// Generate the email body
