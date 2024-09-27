@@ -100,7 +100,7 @@ func UpdateUserProfile(db *gorm.DB) fiber.Handler {
 								"error": "Rating must be between 1 and 5",
 							})
 						}
-						filteredData[key] = int(rating)
+						filteredData[key] = float32(rating)
 					}
 				case "badges":
 					if badges, ok := value.([]interface{}); ok {

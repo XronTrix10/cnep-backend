@@ -14,7 +14,7 @@ type User struct {
 	Skills            pq.StringArray `gorm:"type:text[]" json:"skills"`
 	HelpedOthersCount int            `gorm:"default:0" json:"helped_others_count"`
 	HelpReceivedCount int            `gorm:"default:0" json:"help_received_count"`
-	Rating            int            `gorm:"default:0" json:"rating"`
+	Rating            float32        `gorm:"default:0" json:"rating"`
 	Badges            pq.Int64Array  `gorm:"type:integer[]" json:"badges"`
 	Designation       string         `json:"designation"`
 	Password          string         `gorm:"not null" json:"password"`
@@ -34,7 +34,7 @@ type UserResponse struct {
 	Skills            pq.StringArray `gorm:"type:text[]" json:"skills"`
 	HelpedOthersCount int            `gorm:"default:0" json:"helped_others_count"`
 	HelpReceivedCount int            `gorm:"default:0" json:"help_received_count"`
-	Rating            int            `gorm:"default:0" json:"rating"`
+	Rating            float32        `gorm:"default:0" json:"rating"`
 	Badges            pq.Int64Array  `gorm:"type:integer[]" json:"badges"`
 	Designation       string         `json:"designation"`
 	IsVerified        bool           `gorm:"default:false" json:"is_verified"`
