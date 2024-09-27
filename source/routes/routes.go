@@ -14,9 +14,8 @@ func SetupRoutes(app *fiber.App, db *gorm.DB) {
 	app.Use(middleware.Logger())
 	
 	// Public routes
-	app.Get("/api/auth/users", handlers.CheckEmailExistence(db))
-	app.Post("/api/auth/register", handlers.Register(db))
-	app.Post("/api/auth/login", handlers.Login(db))
+	app.Get("/api/auth/users", handlers.CheckEmailExistence())
+	app.Post("/api/auth/continue", handlers.Authentication())
 	app.Post("/api/otp/generate", handlers.RegenerateOTP())
 	app.Post("/api/otp/verify", handlers.VerifyOTP())
 
