@@ -6,6 +6,7 @@ import (
 	"github.com/gofiber/fiber/v2"
 	"github.com/lib/pq"
 	"gorm.io/gorm"
+	"strconv"
 )
 
 /*
@@ -170,5 +171,37 @@ func UpdateUserProfile(db *gorm.DB) fiber.Handler {
 			"message": "User profile updated successfully",
 			"user":    utils.ConvertToUserResponse(&user),
 		})
+	}
+}
+
+/*
+GetUserProfileByID: Fetches the user profile for the specified user ID.
+It takes the user ID from the URL parameter and fetches the user profile from the database.
+If the user is not found or any other error occurs, it returns an appropriate error message.
+The function returns a JSON response with the user profile.
+*/
+func GetUserProfileByID(db *gorm.DB) fiber.Handler {
+	return func(c *fiber.Ctx) error {
+		// Get the user ID from the URL parameter
+		userIDParam := c.Params("id")
+
+		// Validate that the user ID is an integer
+		userID, err := strconv.Atoi(userIDParam)
+		if err != nil {
+			return c.Status(fiber.StatusBadRequest).JSON(fiber.Map{"error": "Invalid user ID format"})
+		}
+
+		var user models.User
+		if err := db.First(&user, "id = ?", userID).Error; err != nil {
+			if err == gorm.ErrRecordNotFound {
+				return c.Status(fiber.StatusNotFound).JSON(fiber.Map{"error": "User not found"})
+			}
+			return c.Status(fiber.StatusInternalServerError).JSON(fiber.Map{"error": "Failed to fetch user profile"})
+		}
+
+		// Convert the user model to a UserResponse
+		userResponse := utils.ConvertToUserResponse(&user)
+
+		return c.Status(fiber.StatusOK).JSON(userResponse)
 	}
 }
