@@ -25,6 +25,9 @@ func SetupRoutes(app *fiber.App) {
 	api.Get("/users/profile", handlers.GetUserProfile())
 	api.Get("/users/profile/:id", handlers.GetUserProfileByID())
 	api.Put("/users/profile", handlers.UpdateUserProfile())
+	
+	// Sensitive routes
+	api.Post("/users/password/change", handlers.ChangePassword())
 
 	// // Post routes
 	// api.Get("/posts", handlers.GetPosts(db))
