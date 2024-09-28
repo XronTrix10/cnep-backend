@@ -11,8 +11,8 @@ type Post struct {
 	IsUrgent   bool      `gorm:"not null" json:"is_urgent"`
 	Status     string    `gorm:"not null;check:status IN ('accepted', 'completed', 'pending')" json:"status"`
 	AssignedTo uint      `json:"assigned_to"`
-	MediaURL   string    `gorm:"not null" json:"media_url"`
-	MediaType  string    `gorm:"not null" json:"media_type"`
+	MediaURL   string    `json:"media_url"`
+	MediaType  string    `json:"media_type"`
 	Caption    string    `gorm:"not null" json:"caption"`
 	CreatedAt  time.Time `gorm:"default:current_timestamp" json:"created_at"`
 	UpdatedAt  time.Time `gorm:"default:current_timestamp" json:"updated_at"`
