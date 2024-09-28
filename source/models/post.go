@@ -9,11 +9,11 @@ type Post struct {
 	UserID     uint      `gorm:"not null" json:"user_id"`
 	IsRequest  bool      `gorm:"not null" json:"is_request"`
 	IsUrgent   bool      `gorm:"not null" json:"is_urgent"`
-	Status     string    `gorm:"not null;check:status IN ('accepted', 'completed', 'pending', 'urgent')" json:"status"`
+	Status     string    `gorm:"not null;check:status IN ('accepted', 'completed', 'pending')" json:"status"`
 	AssignedTo uint      `json:"assigned_to"`
-	Content    string    `gorm:"not null" json:"content"`
+	MediaURL   string    `gorm:"not null" json:"media_url"`
+	MediaType  string    `gorm:"not null" json:"media_type"`
+	Caption    string    `gorm:"not null" json:"caption"`
 	CreatedAt  time.Time `gorm:"default:current_timestamp" json:"created_at"`
 	UpdatedAt  time.Time `gorm:"default:current_timestamp" json:"updated_at"`
-	User       User      `gorm:"foreignKey:UserID" json:"user"`
-	AssignedUser User    `gorm:"foreignKey:AssignedTo" json:"assigned_user"`
 }
