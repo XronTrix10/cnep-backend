@@ -31,6 +31,11 @@ func SetupRoutes(app *fiber.App) {
 	// Sensitive routes
 	api.Post("/users/password/change", handlers.ChangePassword())
 
+	// Feedback routes
+	api.Post("/users/feedback", handlers.AddFeedback())
+	api.Get("/users/feedback", handlers.GetFeedback())
+	api.Get("/users/feedback/:id", handlers.GetFeedbackByID())
+
 	// // Post routes
 	// api.Get("/posts", handlers.GetPosts(db))
 	// api.Post("/posts", handlers.CreatePost(db))

@@ -79,11 +79,12 @@ func RegisterService(c *fiber.Ctx, email, password string) error {
 		}
 		return c.Status(fiber.StatusInternalServerError).JSON(fiber.Map{"error": "Could not create user"})
 	}
+	log.Println("OTP sent to user ", user.Email, "with OTP ", otp)
 
 	// Send OTP via email
-	if err := utils.SendOTPEmail(user.Email, otp); err != nil {
-		return c.Status(fiber.StatusInternalServerError).JSON(fiber.Map{"error": "Could not send OTP email"})
-	}
+	// if err := utils.SendOTPEmail(user.Email, otp); err != nil {
+	// 	return c.Status(fiber.StatusInternalServerError).JSON(fiber.Map{"error": "Could not send OTP email"})
+	// }
 
 	return c.Status(fiber.StatusCreated).JSON(fiber.Map{
 		"message": "User registered. Please verify your email with the OTP sent.",
