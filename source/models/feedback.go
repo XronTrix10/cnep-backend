@@ -10,6 +10,4 @@ type Feedback struct {
 	Rating     uint8     `gorm:"not null" json:"rating"`
 	CreatedAt  time.Time `gorm:"default:current_timestamp" json:"created_at"`
 	UpdatedAt  time.Time `gorm:"default:current_timestamp" json:"updated_at"`
-	Sender     User      `gorm:"foreignKey:SenderID" json:"sender"`
-	Receiver   User      `gorm:"foreignKey:ReceiverID" json:"receiver"`
 }
