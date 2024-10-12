@@ -7,6 +7,7 @@ import (
 	"cnep-backend/source/config"
 	"cnep-backend/source/database"
 	"cnep-backend/source/routes"
+	"cnep-backend/source/handlers"
 
 	"github.com/gofiber/fiber/v2"
 	"github.com/joho/godotenv"
@@ -23,6 +24,8 @@ func main() {
 
 	// Initialize SMTP
 	lib.InitSMTP()
+	// Initialize Start time
+	handlers.StatusInit()
 
 	// Initialize database
 	database.Connect(cfg)

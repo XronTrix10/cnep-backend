@@ -11,6 +11,8 @@ func SetupRoutes(app *fiber.App) {
 
 	// use logger middleware
 	app.Use(middleware.Logger())
+
+	app.Get("/", handlers.Status())
 	
 	// Public routes
 	app.Get("/api/auth/users", handlers.CheckEmailExistence())
