@@ -161,11 +161,7 @@ func GetPendingPartners(c *fiber.Ctx, userID uint) error {
 	}
 
 	for _, partner := range partners {
-		if userID == partner.SenderID {
-			ids = append(ids, partner.ReceiverID)
-		} else {
-			ids = append(ids, partner.SenderID)
-		}
+		ids = append(ids, partner.SenderID)
 	}
 
 	// If no partners found, return an empty array
