@@ -98,6 +98,8 @@ func CancelPartnerRequest(c *fiber.Ctx, userID, partnerID uint) error {
 
 func GetPartners(c *fiber.Ctx, userID uint) error {
 	var partners []models.Partner
+	var ids []uint
+	var users []models.UserResponse
 
 	// Ensure database connection is established
 	if database.DB == nil {
@@ -111,14 +113,37 @@ func GetPartners(c *fiber.Ctx, userID uint) error {
 		return c.Status(fiber.StatusNotFound).JSON(fiber.Map{"error": "Partner request not found"})
 	}
 
+	for _, partner := range partners {
+		if userID == partner.SenderID {
+			ids = append(ids, partner.ReceiverID)
+		} else {
+			ids = append(ids, partner.SenderID)
+		}
+	}
+
+	// If no partners found, return an empty array
+	if len(ids) == 0 {
+		return c.Status(fiber.StatusNotFound).JSON(fiber.Map{
+			"status":   "empty array",
+			"partners": users,
+		})
+	}
+
+	// Retrieve user information for the collected IDs
+	if err := database.DB.Table("users").Where("id IN ?", ids).Find(&users).Error; err != nil {
+		return c.Status(fiber.StatusInternalServerError).JSON(fiber.Map{"error": "Failed to retrieve user information"})
+	}
+
 	return c.Status(fiber.StatusOK).JSON(fiber.Map{
 		"status":   "ok",
-		"partners": partners,
+		"partners": users,
 	})
 }
 
 func GetPendingPartners(c *fiber.Ctx, userID uint) error {
 	var partners []models.Partner
+	var ids []uint
+	var users []models.UserResponse
 
 	// Ensure database connection is established
 	if database.DB == nil {
@@ -135,8 +160,29 @@ func GetPendingPartners(c *fiber.Ctx, userID uint) error {
 		})
 	}
 
+	for _, partner := range partners {
+		if userID == partner.SenderID {
+			ids = append(ids, partner.ReceiverID)
+		} else {
+			ids = append(ids, partner.SenderID)
+		}
+	}
+
+	// If no partners found, return an empty array
+	if len(ids) == 0 {
+		return c.Status(fiber.StatusNotFound).JSON(fiber.Map{
+			"status":   "empty array",
+			"partners": users,
+		})
+	}
+
+	// Retrieve user information for the collected IDs
+	if err := database.DB.Table("users").Where("id IN ?", ids).Find(&users).Error; err != nil {
+		return c.Status(fiber.StatusInternalServerError).JSON(fiber.Map{"error": "Failed to retrieve user information"})
+	}
+
 	return c.Status(fiber.StatusOK).JSON(fiber.Map{
 		"status":   "ok",
-		"partners": partners,
+		"partners": users,
 	})
 }
