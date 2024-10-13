@@ -2,6 +2,7 @@ package handlers
 
 import (
 	"cnep-backend/source/services"
+	"cnep-backend/pkg/template"
 	"github.com/gofiber/fiber/v2"
 )
 
@@ -16,9 +17,7 @@ func ChangePassword() fiber.Handler {
 		// Get the user ID from the context (set by the AuthMiddleware)
 		userID, ok := c.Locals("userID").(uint)
 		if !ok {
-			return c.Status(fiber.StatusUnauthorized).JSON(fiber.Map{
-				"error": "Unauthorized: Invalid user ID",
-			})
+			return template.Unauthenticated(c)
 		}
 
 		var input struct {

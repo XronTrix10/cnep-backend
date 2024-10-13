@@ -2,6 +2,8 @@ package handlers
 
 import (
 	"cnep-backend/source/services"
+	"cnep-backend/pkg/template"
+
 	"github.com/gofiber/fiber/v2"
 	"strconv"
 )
@@ -17,9 +19,7 @@ func GetUserProfile() fiber.Handler {
 		// Get the user ID from the context (set by the AuthMiddleware)
 		userID, ok := c.Locals("userID").(uint)
 		if !ok {
-			return c.Status(fiber.StatusUnauthorized).JSON(fiber.Map{
-				"error": "Unauthorized: Invalid user ID",
-			})
+			return template.Unauthenticated(c)
 		}
 
 		user, err := services.GetUserProfileByID(uint(userID))
@@ -74,9 +74,7 @@ func UpdateUserProfile() fiber.Handler {
 	return func(c *fiber.Ctx) error {
 		userID, ok := c.Locals("userID").(uint)
 		if !ok {
-			return c.Status(fiber.StatusUnauthorized).JSON(fiber.Map{
-				"error": "Unauthorized: Invalid user ID",
-			})
+			return template.Unauthenticated(c)
 		}
 
 		var updateData map[string]interface{}

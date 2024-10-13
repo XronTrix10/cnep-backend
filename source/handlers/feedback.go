@@ -2,6 +2,7 @@ package handlers
 
 import (
 	"cnep-backend/source/services"
+	"cnep-backend/pkg/template"
 	"github.com/gofiber/fiber/v2"
 	"strconv"
 )
@@ -22,9 +23,7 @@ func AddFeedback() fiber.Handler {
 
 		userID, ok := c.Locals("userID").(uint)
 		if !ok {
-			return c.Status(fiber.StatusUnauthorized).JSON(fiber.Map{
-				"error": "Unauthorized: Invalid user ID",
-			})
+			return template.Unauthenticated(c)
 		}
 
 		if err := c.BodyParser(&input); err != nil {
@@ -40,9 +39,7 @@ func GetFeedback() fiber.Handler {
 
 		userID, ok := c.Locals("userID").(uint)
 		if !ok {
-			return c.Status(fiber.StatusUnauthorized).JSON(fiber.Map{
-				"error": "Unauthorized: Invalid user ID",
-			})
+			return template.Unauthenticated(c)
 		}
 
 		return services.GetFeedbackByUserID(c, userID)
