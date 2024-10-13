@@ -23,18 +23,29 @@ func SetupRoutes(app *fiber.App) {
 	// Protected routes
 	api := app.Group("/api", middleware.AuthMiddleware())
 
+	// ===================================================================
+
+	usersApi := api.Group("/users")
+
 	// User routes
-	api.Get("/users/profile", handlers.GetUserProfile())
-	api.Get("/users/profile/:id", handlers.GetUserProfileByID())
-	api.Put("/users/profile", handlers.UpdateUserProfile())
+	usersApi.Get("/profile", handlers.GetUserProfile())
+	usersApi.Get("/profile/:id", handlers.GetUserProfileByID())
+	usersApi.Put("/profile", handlers.UpdateUserProfile())
 	
 	// Sensitive routes
-	api.Post("/users/password/change", handlers.ChangePassword())
+	usersApi.Post("/password/change", handlers.ChangePassword())
 
 	// Feedback routes
-	api.Post("/users/feedback", handlers.AddFeedback())
-	api.Get("/users/feedback", handlers.GetFeedback())
-	api.Get("/users/feedback/:id", handlers.GetFeedbackByID())
+	usersApi.Post("/feedback", handlers.AddFeedback())
+	usersApi.Get("/feedback", handlers.GetFeedback())
+	usersApi.Get("/feedback/:id", handlers.GetFeedbackByID())
+
+	// Partner routes
+	usersApi.Get("/partner", handlers.GetPartners())
+	usersApi.Post("/partner", handlers.AddPartner())
+	usersApi.Put("/partner/:id", handlers.UpdatePartnerStatus())
+	usersApi.Get("/partner/pending", handlers.GetPendingPartners())
+	usersApi.Delete("/partner/:id", handlers.CancelPartnerRequest())
 
 	// // Post routes
 	// api.Get("/posts", handlers.GetPosts(db))
@@ -46,10 +57,6 @@ func SetupRoutes(app *fiber.App) {
 	// // Comment routes
 	// api.Get("/posts/:id/comments", handlers.GetComments(db))
 	// api.Post("/posts/:id/comments", handlers.CreateComment(db))
-
-	// // Connection routes
-	// api.Post("/connections", handlers.CreateConnection(db))
-	// api.Put("/connections/:id", handlers.UpdateConnection(db))
 
 	// // Conversation routes
 	// api.Get("/conversations", handlers.GetConversations(db))

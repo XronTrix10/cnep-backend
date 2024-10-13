@@ -44,7 +44,7 @@ type UserResponse struct {
 	UpdatedAt         time.Time      `gorm:"default:current_timestamp" json:"updated_at"`
 }
 
-type Partners struct {
+type Partner struct {
 	ID         uint      `gorm:"primaryKey" json:"id"`
 	SenderID   uint      `gorm:"not null" json:"sender_id"`
 	ReceiverID uint      `gorm:"not null" json:"receiver_id"`
@@ -72,3 +72,6 @@ type Badge struct {
 	CreatedAt   time.Time `gorm:"default:current_timestamp" json:"created_at"`
 	UpdatedAt   time.Time `gorm:"default:current_timestamp" json:"updated_at"`
 }
+
+// TODO: Extract helps in another table from users table
+
