@@ -5,6 +5,7 @@ import (
 	"time"
 )
 
+// Original User struct
 type User struct {
 	ID                uint           `gorm:"primaryKey" json:"id"`
 	Name              string         `gorm:"not null" json:"name"`
@@ -25,6 +26,7 @@ type User struct {
 	UpdatedAt         time.Time      `gorm:"default:current_timestamp" json:"updated_at"`
 }
 
+// Excluded sensitive fields from User
 type UserResponse struct {
 	ID                uint           `gorm:"primaryKey" json:"id"`
 	Name              string         `gorm:"not null" json:"name"`
@@ -40,4 +42,33 @@ type UserResponse struct {
 	IsVerified        bool           `gorm:"default:false" json:"is_verified"`
 	CreatedAt         time.Time      `gorm:"default:current_timestamp" json:"created_at"`
 	UpdatedAt         time.Time      `gorm:"default:current_timestamp" json:"updated_at"`
+}
+
+type Partners struct {
+	ID         uint      `gorm:"primaryKey" json:"id"`
+	SenderID   uint      `gorm:"not null" json:"sender_id"`
+	ReceiverID uint      `gorm:"not null" json:"receiver_id"`
+	Status     string    `gorm:"not null;check:status IN ('pending', 'accepted', 'declined')" json:"status"`
+	SentAt     time.Time `gorm:"default:current_timestamp" json:"sent_at"`
+	UpdatedAt  time.Time `gorm:"default:current_timestamp" json:"updated_at"`
+}
+
+
+type Feedback struct {
+	ID         uint      `gorm:"primaryKey" json:"id"`
+	SenderID   uint      `gorm:"not null" json:"sender_id"`
+	ReceiverID uint      `gorm:"not null" json:"receiver_id"`
+	Content    string    `gorm:"not null" json:"content"`
+	Rating     uint8     `gorm:"not null" json:"rating"`
+	CreatedAt  time.Time `gorm:"default:current_timestamp" json:"created_at"`
+	UpdatedAt  time.Time `gorm:"default:current_timestamp" json:"updated_at"`
+}
+
+type Badge struct {
+	ID          uint      `gorm:"primaryKey" json:"id"`
+	Name        string    `gorm:"not null" json:"name"`
+	Description string    `json:"description"`
+	Image       string    `gorm:"not null" json:"image"`
+	CreatedAt   time.Time `gorm:"default:current_timestamp" json:"created_at"`
+	UpdatedAt   time.Time `gorm:"default:current_timestamp" json:"updated_at"`
 }
