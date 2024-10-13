@@ -1,18 +1,12 @@
 package services
 
 import (
+	"cnep-backend/pkg/consts"
 	"cnep-backend/source/database"
 	"cnep-backend/source/models"
 
 	"github.com/gofiber/fiber/v2"
 	"log"
-)
-
-const (
-	PARTNER_STATUS_PENDING  = "pending"
-	PARTNER_STATUS_ACCEPTED = "accepted"
-	PARTNER_STATUS_DECLINED = "declined"
-	TABLE_NAME              = "partners"
 )
 
 func AddPartner(c *fiber.Ctx, senderID, receiverID uint) error {
@@ -30,9 +24,9 @@ func AddPartner(c *fiber.Ctx, senderID, receiverID uint) error {
 
 	partner.SenderID = senderID
 	partner.ReceiverID = receiverID
-	partner.Status = PARTNER_STATUS_PENDING
+	partner.Status = consts.PARTNER_STATUS_PENDING
 
-	if err := database.DB.Table(TABLE_NAME).Create(&partner).Error; err != nil {
+	if err := database.DB.Table(consts.PARTNERS_TABLE).Create(&partner).Error; err != nil {
 		return c.Status(fiber.StatusInternalServerError).JSON(fiber.Map{"error": "Could not create partner"})
 	}
 
@@ -51,18 +45,19 @@ func UpdatePartnerStatus(c *fiber.Ctx, userID, partnerID uint, accepted bool) er
 		return c.Status(fiber.StatusInternalServerError).JSON(fiber.Map{"error": "Database not connected"})
 	}
 
-	if err := database.DB.Table(TABLE_NAME).Where("receiver_id = ? AND sender_id = ?", userID, partnerID).
+	if err := database.DB.Table(consts.PARTNERS_TABLE).
+		Where("receiver_id = ? AND sender_id = ?", userID, partnerID).
 		First(&partner).Error; err != nil {
 		return c.Status(fiber.StatusNotFound).JSON(fiber.Map{"error": "User or Partner not found"})
 	}
 
 	if accepted {
-		partner.Status = PARTNER_STATUS_ACCEPTED
+		partner.Status = consts.PARTNER_STATUS_ACCEPTED
 	} else {
-		partner.Status = PARTNER_STATUS_DECLINED
+		partner.Status = consts.PARTNER_STATUS_DECLINED
 	}
 
-	if err := database.DB.Table(TABLE_NAME).Save(&partner).Error; err != nil {
+	if err := database.DB.Table(consts.PARTNERS_TABLE).Save(&partner).Error; err != nil {
 		return c.Status(fiber.StatusInternalServerError).JSON(fiber.Map{"error": "Could not update partner status"})
 	}
 
@@ -81,12 +76,13 @@ func CancelPartnerRequest(c *fiber.Ctx, userID, partnerID uint) error {
 		return c.Status(fiber.StatusInternalServerError).JSON(fiber.Map{"error": "Database not connected"})
 	}
 
-	if err := database.DB.Table(TABLE_NAME).Where("receiver_id = ? AND sender_id = ?", partnerID, userID).
+	if err := database.DB.Table(consts.PARTNERS_TABLE).
+		Where("receiver_id = ? AND sender_id = ?", partnerID, userID).
 		First(&partner).Error; err != nil {
 		return c.Status(fiber.StatusNotFound).JSON(fiber.Map{"error": "Partner request does not exist"})
 	}
 
-	if err := database.DB.Table(TABLE_NAME).Delete(&partner).Error; err != nil {
+	if err := database.DB.Table(consts.PARTNERS_TABLE).Delete(&partner).Error; err != nil {
 		return c.Status(fiber.StatusInternalServerError).JSON(fiber.Map{"error": "Could not cancel partner request"})
 	}
 
@@ -107,8 +103,8 @@ func GetPartners(c *fiber.Ctx, userID uint) error {
 		return c.Status(fiber.StatusInternalServerError).JSON(fiber.Map{"error": "Database not connected"})
 	}
 
-	if err := database.DB.Table(TABLE_NAME).
-		Where("receiver_id = ? OR sender_id = ? AND status = ?", userID, userID, PARTNER_STATUS_ACCEPTED).
+	if err := database.DB.Table(consts.PARTNERS_TABLE).
+		Where("receiver_id = ? OR sender_id = ? AND status = ?", userID, userID, consts.PARTNER_STATUS_ACCEPTED).
 		Find(&partners).Error; err != nil {
 		return c.Status(fiber.StatusNotFound).JSON(fiber.Map{"error": "Partner request not found"})
 	}
@@ -131,7 +127,8 @@ func GetPartners(c *fiber.Ctx, userID uint) error {
 
 	// Retrieve user information for the collected IDs
 	if err := database.DB.Table("users").Where("id IN ?", ids).Find(&users).Error; err != nil {
-		return c.Status(fiber.StatusInternalServerError).JSON(fiber.Map{"error": "Failed to retrieve user information"})
+		return c.Status(fiber.StatusInternalServerError).
+			JSON(fiber.Map{"error": "Failed to retrieve user information"})
 	}
 
 	return c.Status(fiber.StatusOK).JSON(fiber.Map{
@@ -151,8 +148,8 @@ func GetPendingPartners(c *fiber.Ctx, userID uint) error {
 		return c.Status(fiber.StatusInternalServerError).JSON(fiber.Map{"error": "Database not connected"})
 	}
 
-	if err := database.DB.Table(TABLE_NAME).
-		Where("receiver_id = ? AND status = ?", userID, PARTNER_STATUS_PENDING).
+	if err := database.DB.Table(consts.PARTNERS_TABLE).
+		Where("receiver_id = ? AND status = ?", userID, consts.PARTNER_STATUS_PENDING).
 		Find(&partners).Error; err != nil {
 		return c.Status(fiber.StatusNotFound).JSON(fiber.Map{
 			"status":   "No pending partners found",
@@ -174,7 +171,8 @@ func GetPendingPartners(c *fiber.Ctx, userID uint) error {
 
 	// Retrieve user information for the collected IDs
 	if err := database.DB.Table("users").Where("id IN ?", ids).Find(&users).Error; err != nil {
-		return c.Status(fiber.StatusInternalServerError).JSON(fiber.Map{"error": "Failed to retrieve user information"})
+		return c.Status(fiber.StatusInternalServerError).
+			JSON(fiber.Map{"error": "Failed to retrieve user information"})
 	}
 
 	return c.Status(fiber.StatusOK).JSON(fiber.Map{

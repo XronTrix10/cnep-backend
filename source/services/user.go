@@ -1,6 +1,7 @@
 package services
 
 import (
+	"cnep-backend/pkg/consts"
 	"cnep-backend/source/database"
 	"cnep-backend/source/models"
 
@@ -22,7 +23,7 @@ func GetUserProfileByID(userId uint) (*models.UserResponse, error) {
 		return nil, fiber.NewError(fiber.StatusInternalServerError, "Database not connected")
 	}
 
-	if err := database.DB.Table("users").First(&user, userId).Error; err != nil {
+	if err := database.DB.Table(consts.USERS_TABLE).First(&user, userId).Error; err != nil {
 		if err == gorm.ErrRecordNotFound {
 			return nil, fiber.NewError(fiber.StatusNotFound, "User not found")
 		}
@@ -113,7 +114,7 @@ func UpdateUserProfile(userId uint, updateData map[string]interface{}) (*models.
 		return nil, fiber.NewError(fiber.StatusBadRequest, "No valid fields to update")
 	}
 
-	if err := database.DB.First(&user, userId).Error; err != nil {
+	if err := database.DB.Table(consts.USERS_TABLE).First(&user, userId).Error; err != nil {
 		if err == gorm.ErrRecordNotFound {
 			return nil, fiber.NewError(fiber.StatusNotFound, "User not found")
 		}
@@ -121,12 +122,14 @@ func UpdateUserProfile(userId uint, updateData map[string]interface{}) (*models.
 	}
 
 	// Update only the allowed fields
-	if err := database.DB.Model(&user).Updates(filteredData).Error; err != nil {
+	if err := database.DB.Table(consts.USERS_TABLE).Model(&user).
+		Updates(filteredData).Error; err != nil {
 		return nil, fiber.NewError(fiber.StatusInternalServerError, "Error updating user profile")
 	}
 
 	// Fetch the updated user from the database
-	if err := database.DB.Table("users").First(&userResponse, userId).Error; err != nil {
+	if err := database.DB.Table(consts.USERS_TABLE).
+		First(&userResponse, userId).Error; err != nil {
 		return nil, fiber.NewError(fiber.StatusInternalServerError, "Error fetching updated user profile")
 	}
 

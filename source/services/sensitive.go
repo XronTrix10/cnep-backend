@@ -1,12 +1,13 @@
 package services
 
 import (
+	"cnep-backend/pkg/consts"
 	"cnep-backend/pkg/utils"
 	"cnep-backend/source/database"
 	"cnep-backend/source/models"
-	"log"
 
 	"github.com/gofiber/fiber/v2"
+	"log"
 )
 
 /*
@@ -28,7 +29,7 @@ func ChangePassword(c *fiber.Ctx, userId uint, oldPassword string, newPassword s
 		return c.Status(fiber.StatusBadRequest).JSON(fiber.Map{"error": "Invalid password format"})
 	}
 
-	if err := database.DB.Where("id = ?", userId).First(&user).Error; err != nil {
+	if err := database.DB.Table(consts.USERS_TABLE).Where("id = ?", userId).First(&user).Error; err != nil {
 		return c.Status(fiber.StatusNotFound).JSON(fiber.Map{"error": "User not found"})
 	}
 
@@ -43,7 +44,7 @@ func ChangePassword(c *fiber.Ctx, userId uint, oldPassword string, newPassword s
 
 	user.Password = hashedPassword
 
-	if err := database.DB.Save(&user).Error; err != nil {
+	if err := database.DB.Table(consts.USERS_TABLE).Save(&user).Error; err != nil {
 		return c.Status(fiber.StatusInternalServerError).JSON(fiber.Map{"error": "Could not update password"})
 	}
 
