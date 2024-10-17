@@ -1,8 +1,10 @@
 package services
 
 import (
+	"cnep-backend/pkg/consts"
 	"cnep-backend/source/database"
 	"cnep-backend/source/models"
+
 	"github.com/gofiber/fiber/v2"
 	"log"
 )
@@ -36,7 +38,7 @@ func AddFeedback(c *fiber.Ctx, senderID uint, receiverID uint, content string, r
 }
 
 func GetFeedbackByUserID(c *fiber.Ctx, userID uint) error {
-	var feedbacks []models.Feedback
+	var feedbacks []models.FeedbackSender
 
 	// Ensure database connection is established
 	if database.DB == nil {
@@ -44,12 +46,37 @@ func GetFeedbackByUserID(c *fiber.Ctx, userID uint) error {
 		return c.Status(fiber.StatusInternalServerError).JSON(fiber.Map{"error": "Database not connected"})
 	}
 
-	if err := database.DB.Where("receiver_id = ?", userID).Find(&feedbacks).Error; err != nil {
+	err := database.DB.Table(consts.FEEDBACK_TABLE).
+		Select("feedbacks.id as feedback_id, feedbacks.content, feedbacks.rating, feedbacks.sender_id, users.name as sender_name, users.email as sender_email, users.rating as sender_rating, feedbacks.created_at, feedbacks.updated_at").
+		Joins("JOIN users ON feedbacks.sender_id = users.id").
+		Where("feedbacks.receiver_id = ?", userID).
+		Scan(&feedbacks).Error
+
+	if err != nil {
 		return c.Status(fiber.StatusNotFound).JSON(fiber.Map{"error": "Feedback not found"})
+	}
+
+	var nestedFeedbacks []models.FeedbackWithSender
+
+	for _, feedback := range feedbacks {
+		feedback := models.FeedbackWithSender{
+			FeedbackID: feedback.FeedbackID,
+			Content:    feedback.Content,
+			Rating:     feedback.Rating,
+			Sender: models.SenderInfo{
+				ID:     feedback.SenderID,
+				Name:   feedback.SenderName,
+				Email:  feedback.SenderEmail,
+				Rating: feedback.SenderRating,
+			},
+			CreatedAt: feedback.CreatedAt,
+			UpdatedAt: feedback.UpdatedAt,
+		}
+		nestedFeedbacks = append(nestedFeedbacks, feedback)
 	}
 
 	return c.Status(fiber.StatusOK).JSON(fiber.Map{
 		"status":    "success",
-		"feedbacks": feedbacks,
+		"feedbacks": nestedFeedbacks,
 	})
 }

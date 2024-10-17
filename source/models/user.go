@@ -53,7 +53,6 @@ type Partner struct {
 	UpdatedAt  time.Time `gorm:"default:current_timestamp" json:"updated_at"`
 }
 
-
 type Feedback struct {
 	ID         uint      `gorm:"primaryKey" json:"id"`
 	SenderID   uint      `gorm:"not null" json:"sender_id"`
@@ -62,6 +61,35 @@ type Feedback struct {
 	Rating     uint8     `gorm:"not null" json:"rating"`
 	CreatedAt  time.Time `gorm:"default:current_timestamp" json:"created_at"`
 	UpdatedAt  time.Time `gorm:"default:current_timestamp" json:"updated_at"`
+}
+
+// Response struct for feedbacks
+type FeedbackSender struct {
+	FeedbackID   uint      `json:"feedback_id"`
+	Content      string    `json:"content"`
+	Rating       uint8     `json:"rating"`
+	SenderID     uint      `json:"sender_id"`
+	SenderName   string    `json:"sender_name"`
+	SenderEmail  string    `json:"sender_email"`
+	SenderRating float32   `json:"sender_rating"`
+	CreatedAt    time.Time `json:"created_at"`
+	UpdatedAt    time.Time `json:"updated_at"`
+}
+
+type SenderInfo struct {
+	ID     uint    `json:"id"`
+	Name   string  `json:"name"`
+	Email  string  `json:"email"`
+	Rating float32 `json:"rating"`
+}
+
+type FeedbackWithSender struct {
+	FeedbackID uint       `json:"feedback_id"`
+	Content    string     `json:"content"`
+	Rating     uint8      `json:"rating"`
+	Sender     SenderInfo `json:"sender"`
+	CreatedAt  time.Time  `json:"created_at"`
+	UpdatedAt  time.Time  `json:"updated_at"`
 }
 
 type Badge struct {
@@ -74,4 +102,3 @@ type Badge struct {
 }
 
 // TODO: Extract helps in another table from users table
-
