@@ -38,3 +38,11 @@ type Reaction struct {
 	Post      Post      `gorm:"foreignKey:PostID" json:"post"`
 	User      User      `gorm:"foreignKey:UserID" json:"user"`
 }
+
+type Help struct {
+	ID         uint      `gorm:"primaryKey" json:"id"`
+	SenderID   uint      `gorm:"not null" json:"sender_id"`
+	ReceiverID uint      `gorm:"not null" json:"receiver_id"`
+	PostID     uint      `gorm:"not null" json:"post_id"`
+	CreatedAt  time.Time `gorm:"default:current_timestamp" json:"created_at"`
+}
