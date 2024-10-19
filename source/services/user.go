@@ -51,12 +51,10 @@ func UpdateUserProfile(userId uint, updateData map[string]interface{}) (*models.
 		"name":                true,
 		"phone":               true,
 		"address":             true,
-		"skills":              true,
 		"designation":         true,
-		"helped_others_count": true,
-		"help_received_count": true,
 		"rating":              true,
 		"badges":              true,
+		"topics":              true,
 	}
 
 	// Filter out non-allowed fields and validate data
@@ -68,23 +66,6 @@ func UpdateUserProfile(userId uint, updateData map[string]interface{}) (*models.
 				if str, ok := value.(string); ok && str != "" {
 					filteredData[key] = str
 				}
-			case "skills":
-				if skills, ok := updateData["skills"].([]interface{}); ok {
-					// Convert []interface{} to []string
-					var skillsStr []string
-					for _, skill := range skills {
-						if str, ok := skill.(string); ok {
-							skillsStr = append(skillsStr, str)
-						} else {
-							return nil, fiber.NewError(fiber.StatusBadRequest, "Invalid skill type")
-						}
-					}
-					filteredData[key] = pq.StringArray(skillsStr)
-				}
-			case "helped_others_count", "help_received_count":
-				if count, ok := value.(float64); ok {
-					filteredData[key] = uint(count)
-				}
 			case "rating":
 				if rating, ok := value.(float64); ok {
 					if rating > 5 || rating < 1 {
@@ -92,18 +73,18 @@ func UpdateUserProfile(userId uint, updateData map[string]interface{}) (*models.
 					}
 					filteredData[key] = float32(rating)
 				}
-			case "badges":
-				if badges, ok := value.([]interface{}); ok {
+			case "badges", "topics":
+				if values, ok := value.([]interface{}); ok {
 					// Convert []interface{} to []int64
-					intBadges := make([]int64, len(badges))
-					for i, badge := range badges {
+					intValues := make([]int64, len(values))
+					for i, badge := range values {
 						if intBadge, ok := badge.(float64); ok {
-							intBadges[i] = int64(intBadge)
+							intValues[i] = int64(intBadge)
 						} else {
-							return nil, fiber.NewError(fiber.StatusBadRequest, "Invalid badge type")
+							return nil, fiber.NewError(fiber.StatusBadRequest, "Invalid badge or topic type")
 						}
 					}
-					filteredData[key] = pq.Int64Array(intBadges)
+					filteredData[key] = pq.Int64Array(intValues)
 				}
 			}
 		}
