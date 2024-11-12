@@ -7,7 +7,7 @@ import (
 
 type BusinessPage struct {
 	ID          uint          `gorm:"primaryKey" json:"id"`
-	UserID      uint          `gorm:"not null" json:"user_id"` // Reference to owner
+	OwnerID     uint          `gorm:"not null" json:"owner_id"` // Reference to owner
 	User        User          `gorm:"foreignKey:UserID" json:"user"`
 	Name        string        `gorm:"not null" json:"name"`
 	Badges      pq.Int64Array `gorm:"type:integer[]" json:"badges"`

@@ -52,9 +52,9 @@ func UpdateUserProfile(userId uint, updateData map[string]interface{}) (*models.
 		"phone":               true,
 		"address":             true,
 		"designation":         true,
-		"rating":              true,
-		"badges":              true,
-		"topics":              true,
+		"rating":              false,
+		"badges":              false,
+		"topics":              false,
 	}
 
 	// Filter out non-allowed fields and validate data
