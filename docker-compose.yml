@@ -1,0 +1,36 @@
+version: "3.8"
+services:
+  postgres:
+    container_name: postgres-db
+    image: postgres:latest
+    environment:
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: postgres
+      POSTGRES_DB: cnep
+    ports:
+      - "5432:5432"
+    networks:
+      - postgres-network
+    volumes:
+      - postgres-data:/var/lib/postgresql/data  # Mount the postgres-data volume
+      - ./init-scripts:/docker-entrypoint-initdb.d  # Mount the init-scripts folder
+
+  pgadmin:
+    container_name: pgadmin
+    image: dpage/pgadmin4
+    environment:
+      PGADMIN_DEFAULT_EMAIL: admin@cnep.com
+      PGADMIN_DEFAULT_PASSWORD: cnep_password
+    ports:
+      - "8080:80"  # Map the container port 80 to the host port 8080
+    networks:
+      - postgres-network
+    depends_on:
+      - postgres
+
+networks:
+  postgres-network:
+    driver: bridge
+
+volumes:
+  postgres-data:

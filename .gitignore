@@ -18,6 +18,3 @@
 
 # Go workspace file
 go.work
-
-# Development files
-*.sql
