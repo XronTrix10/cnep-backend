@@ -13,7 +13,7 @@ services:
       - postgres-network
     volumes:
       - postgres-data:/var/lib/postgresql/data  # Mount the postgres-data volume
-      - ./init-scripts:/docker-entrypoint-initdb.d  # Mount the init-scripts folder
+      - ./cmd/init-scripts:/docker-entrypoint-initdb.d  # Mount the cmd/init-scripts directory
 
   pgadmin:
     container_name: pgadmin
