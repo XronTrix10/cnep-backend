@@ -1,45 +1,38 @@
 package models
 
-import (
-	"github.com/lib/pq"
-	"time"
-)
+import "time"
 
 // Original User struct
 type User struct {
-	ID          uint          `gorm:"primaryKey" json:"id"`
-	Name        string        `gorm:"not null" json:"name"`
-	Username    string        `gorm:"unique;not null" json:"username"`
-	Email       string        `gorm:"unique;not null" json:"email"`
-	Password    string        `gorm:"not null" json:"password"`
-	Address     string        `json:"address"`
-	Designation string        `json:"designation"`
-	Phone       string        `json:"phone"`
-	Badges      pq.Int64Array `gorm:"type:integer[]" json:"badges"`
-	Topics      pq.Int64Array `gorm:"type:integer[]" json:"topics"`
-	OTP         string        `gorm:"size:6" json:"otp"`
-	OTPExpiry   time.Time     `json:"otp_expiry"`
-	IsVerified  bool          `gorm:"default:false" json:"is_verified"`
-	Rating      float32       `gorm:"default:0" json:"rating"`
-	CreatedAt   time.Time     `gorm:"default:current_timestamp" json:"created_at"`
-	UpdatedAt   time.Time     `gorm:"default:current_timestamp" json:"updated_at"`
+	ID          uint      `gorm:"primaryKey" json:"id"`
+	Name        string    `gorm:"not null" json:"name"`
+	Username    string    `gorm:"not null" json:"username"`
+	Avatar      string    `json:"avatar"`
+	Email       string    `gorm:"unique;not null" json:"email"`
+	Password    string    `gorm:"not null" json:"password"`
+	Address     string    `json:"address"`
+	Designation string    `json:"designation"`
+	Phone       string    `json:"phone"`
+	OTP         string    `gorm:"size:6" json:"otp"`
+	OTPExpiry   time.Time `json:"otp_expiry"`
+	IsVerified  bool      `gorm:"default:false" json:"is_verified"`
+	CreatedAt   time.Time `gorm:"default:current_timestamp" json:"created_at"`
+	UpdatedAt   time.Time `gorm:"default:current_timestamp" json:"updated_at"`
 }
 
 // Excluded sensitive fields from User
 type UserResponse struct {
-	ID          uint          `gorm:"primaryKey" json:"id"`
-	Name        string        `gorm:"not null" json:"name"`
-	Username    string        `gorm:"unique;not null" json:"username"`
-	Email       string        `gorm:"unique;not null" json:"email"`
-	Address     string        `json:"address"`
-	Designation string        `json:"designation"`
-	Phone       string        `json:"phone"`
-	Badges      pq.Int64Array `gorm:"type:integer[]" json:"badges"`
-	Topics      pq.Int64Array `gorm:"type:integer[]" json:"topics"`
-	IsVerified  bool          `gorm:"default:false" json:"is_verified"`
-	Rating      float32       `gorm:"default:0" json:"rating"`
-	CreatedAt   time.Time     `gorm:"default:current_timestamp" json:"created_at"`
-	UpdatedAt   time.Time     `gorm:"default:current_timestamp" json:"updated_at"`
+	ID          uint      `gorm:"primaryKey" json:"id"`
+	Name        string    `gorm:"not null" json:"name"`
+	Username    string    `gorm:"unique;not null" json:"username"`
+	Avatar      string    `json:"avatar"`
+	Email       string    `gorm:"unique;not null" json:"email"`
+	Address     string    `json:"address"`
+	Designation string    `json:"designation"`
+	Phone       string    `json:"phone"`
+	IsVerified  bool      `gorm:"default:false" json:"is_verified"`
+	CreatedAt   time.Time `gorm:"default:current_timestamp" json:"created_at"`
+	UpdatedAt   time.Time `gorm:"default:current_timestamp" json:"updated_at"`
 }
 
 type Partner struct {
