@@ -4,29 +4,53 @@ services:
     container_name: postgres-db
     image: postgres:latest
     environment:
-      POSTGRES_USER: postgres
-      POSTGRES_PASSWORD: postgres
-      POSTGRES_DB: cnep
+      POSTGRES_USER: ${DATABASE_USER}
+      POSTGRES_PASSWORD: ${DATABASE_PASSWORD}
+      POSTGRES_DB: ${DATABASE_NAME}
     ports:
       - "5432:5432"
     networks:
       - postgres-network
     volumes:
-      - postgres-data:/var/lib/postgresql/data  # Mount the postgres-data volume
-      - ./cmd/init-scripts:/docker-entrypoint-initdb.d  # Mount the cmd/init-scripts directory
+      - postgres-data:/var/lib/postgresql/data # Mount the postgres-data volume
+      - ./cmd/init-scripts:/docker-entrypoint-initdb.d # Mount the cmd/init-scripts directory
 
   pgadmin:
     container_name: pgadmin
     image: dpage/pgadmin4
     environment:
-      PGADMIN_DEFAULT_EMAIL: admin@cnep.com
-      PGADMIN_DEFAULT_PASSWORD: cnep_password
+      PGADMIN_DEFAULT_EMAIL: ${PGADMIN_EMAIL}
+      PGADMIN_DEFAULT_PASSWORD: ${PGADMIN_PASSWORD}
     ports:
-      - "8080:80"  # Map the container port 80 to the host port 8080
+      - "5000:80" # Map the container port 80 to the host port 5000
     networks:
       - postgres-network
     depends_on:
       - postgres
+
+  api:
+    container_name: golang-api
+    build:
+      context: .
+      dockerfile: Dockerfile
+    ports:
+      - "8080:8080" # Adjust the port according to your Go app
+    networks:
+      - postgres-network
+    depends_on:
+      - postgres
+    volumes:
+      - .:/app # For development hot-reload, should be removed in production
+    environment:
+      DB_HOST: postgres
+      DB_USER: ${DB_USER}
+      DB_PASSWORD: ${DB_PASSWORD}
+      DB_NAME: ${DB_NAME}
+      DB_PORT: ${DB_PORT}
+      JWT_SECRET: ${JWT_SECRET}
+      PORT: 8080
+      SENDER_EMAIL: ${SENDER_EMAIL}
+      SMTP_PASSWORD: ${SMTP_PASSWORD}
 
 networks:
   postgres-network:
