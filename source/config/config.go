@@ -23,7 +23,7 @@ func New() *Config {
 		DBName:     getEnv("DB_NAME", "social_media_db"),
 		DBPort:     getEnv("DB_PORT", "5432"),
 		JWTSecret:  getEnv("JWT_SECRET", "your-secret-key"),
-		ServerPort: getEnv("PORT", "3000"),
+		ServerPort: getEnv("PORT", "8080"),
 	}
 }
 
