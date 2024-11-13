@@ -8,7 +8,7 @@ services:
       POSTGRES_PASSWORD: ${DATABASE_PASSWORD}
       POSTGRES_DB: ${DATABASE_NAME}
     ports:
-      - "5432:5432"
+      - "5444:5432" # Map the container port 5432 to the host port 5444
     networks:
       - postgres-network
     volumes:
@@ -39,14 +39,12 @@ services:
       - postgres-network
     depends_on:
       - postgres
-    volumes:
-      - .:/app # For development hot-reload, should be removed in production
     environment:
-      DB_HOST: postgres
+      DB_HOST: postgres # It will connect to the postgres container host
       DB_USER: ${DB_USER}
       DB_PASSWORD: ${DB_PASSWORD}
       DB_NAME: ${DB_NAME}
-      DB_PORT: ${DB_PORT}
+      DB_PORT: 5432 # It will connect to the postgres container port
       JWT_SECRET: ${JWT_SECRET}
       PORT: 8080
       SENDER_EMAIL: ${SENDER_EMAIL}
